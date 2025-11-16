@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package weather;
+
+// Structura cererii de la client
+message WeatherRequest {
+  string city = 1;
+}
+
+// Structura răspunsului de la server
+message WeatherResponse {
+  string city = 1;
+  float temperature = 2;
+  string description = 3;
+  int32 humidity = 4;
+  float wind_speed = 5;
+}
+
+// Definirea serviciului gRPC
+service WeatherService {
+  rpc GetWeather (WeatherRequest) returns (WeatherResponse);
+}
