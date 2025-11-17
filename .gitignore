@@ -1,8 +1,26 @@
+# Virtual environments
 .venv/
-.env
+venv/
+
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
+
+# IDEs
 .idea/
 .vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
+
+# Env files (sensitive)
+.env
+
+# gRPC generated files cache
 server/api/__pycache__/
+server/api/*.pyc
