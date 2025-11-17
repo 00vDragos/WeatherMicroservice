@@ -1,5 +1,6 @@
-grpcio
+grpcio~=1.76.0
 grpcio-tools
-requests
+requests~=2.32.5
 pymongo
-python-dotenv
+python-dotenv~=1.2.1
+protobuf~=6.33.1
