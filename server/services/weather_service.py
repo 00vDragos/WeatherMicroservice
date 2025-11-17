@@ -23,7 +23,7 @@ class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
             response.raise_for_status()
             data = response.json()
 
-            # Extragem datele din răspuns
+            # Extragem datele din raspuns
             temperature = data["main"]["temp"]
             humidity = data["main"]["humidity"]
             description = data["weather"][0]["description"]

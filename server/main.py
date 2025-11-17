@@ -7,7 +7,7 @@ from server.api import weather_pb2_grpc
 from server.services.weather_service import WeatherService  # urmează să-l implementăm
 
 
-# Încarcă variabilele din fișierul .env
+#variabilele din fișierul .env
 load_dotenv()
 GRPC_API_KEY = os.getenv("GRPC_API_KEY")
 PORT = 50051
@@ -31,7 +31,7 @@ def serve():
         interceptors=(AuthInterceptor(),)
     )
 
-    # Înregistrare serviciu WeatherService
+    # Inregistrare serviciu WeatherService
     weather_pb2_grpc.add_WeatherServiceServicer_to_server(
         WeatherService(), server
     )
