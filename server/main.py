@@ -3,8 +3,9 @@ import grpc
 from dotenv import load_dotenv
 from concurrent import futures
 
-from server.api import weather_pb2_grpc
-from server.services.weather_service import WeatherService  # urmează să-l implementăm
+from api import weather_pb2, weather_pb2_grpc
+from services.weather_service import WeatherService
+
 
 
 #variabilele din fișierul .env
