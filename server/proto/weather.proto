@@ -1,16 +1,9 @@
-
 syntax = "proto3";
 
-package weather;
-
-
-
-// Cerere de la client
 message WeatherRequest {
   string city = 1;
 }
 
-// Răspuns de la server
 message WeatherResponse {
   string city = 1;
   float temperature = 2;
@@ -19,7 +12,6 @@ message WeatherResponse {
   float wind_speed = 5;
 }
 
-// Definire serviciu gRPC
 service WeatherService {
   rpc GetWeather (WeatherRequest) returns (WeatherResponse);
 }

@@ -2,6 +2,8 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 import warnings
+
+
 from server.api import weather_pb2 as weather__pb2
 
 
@@ -26,8 +28,7 @@ if _version_not_supported:
 
 
 class WeatherServiceStub(object):
-    """Definire serviciu gRPC
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -36,15 +37,14 @@ class WeatherServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetWeather = channel.unary_unary(
-                '/weather.WeatherService/GetWeather',
+                '/WeatherService/GetWeather',
                 request_serializer=weather__pb2.WeatherRequest.SerializeToString,
                 response_deserializer=weather__pb2.WeatherResponse.FromString,
                 _registered_method=True)
 
 
 class WeatherServiceServicer(object):
-    """Definire serviciu gRPC
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def GetWeather(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -62,15 +62,14 @@ def add_WeatherServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'weather.WeatherService', rpc_method_handlers)
+            'WeatherService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('weather.WeatherService', rpc_method_handlers)
+    server.add_registered_method_handlers('WeatherService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
 class WeatherService(object):
-    """Definire serviciu gRPC
-    """
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def GetWeather(request,
@@ -86,7 +85,7 @@ class WeatherService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/weather.WeatherService/GetWeather',
+            '/WeatherService/GetWeather',
             weather__pb2.WeatherRequest.SerializeToString,
             weather__pb2.WeatherResponse.FromString,
             options,
