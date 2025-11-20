@@ -5,7 +5,8 @@ from concurrent import futures
 
 from api import weather_pb2, weather_pb2_grpc
 from services.weather_service import WeatherService
-
+from fastapi import FastAPI
+from api.rest_api import router as rest_router
 
 
 #variabilele din fișierul .env
@@ -45,3 +46,6 @@ def serve():
 
 if __name__ == "__main__":
     serve()
+
+app = FastAPI()
+app.include_router(rest_router)

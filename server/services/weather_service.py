@@ -22,20 +22,20 @@ class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
             f"?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
         )
 
-        print(f"[DEBUG] Fetching weather for city: {city}")
-        print(f"[DEBUG] API key: {OPENWEATHER_API_KEY}")
-        print(f"[DEBUG] URL: {url}")
+        print(f" Fetching weather for city: {city}")
+        print(f" API key: {OPENWEATHER_API_KEY}")
+        print(f"URL: {url}")
 
         try:
             response = requests.get(url)
-            print(f"[DEBUG] Raw response object: {response}")
-            print(f"[DEBUG] Status code: {response.status_code}")
+            print(f" Raw response object: {response}")
+            print(f" Status code: {response.status_code}")
 
             response.raise_for_status()  # va genera HTTPError pentru coduri 4xx/5xx
 
-            print("[DEBUG] Status OK. Parsing JSON...")
+            print(" Status OK. Parsing JSON...")
             data = response.json()
-            print(f"[DEBUG] OpenWeatherMap raw response: {data}")
+            print(f"OpenWeatherMap raw response: {data}")
 
             # Extragem datele
             temperature = data["main"]["temp"]
@@ -43,7 +43,7 @@ class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
             description = data["weather"][0]["description"]
             wind_speed = data["wind"]["speed"]
 
-            print(f"[DEBUG] Extracted data → temp: {temperature}, humidity: {humidity}, desc: {description}, wind: {wind_speed}")
+            print(f"Extracted data-> temp: {temperature}, humidity: {humidity}, desc: {description}, wind: {wind_speed}")
 
             # Salvăm în MongoDB
             self.repo.save_weather_data(
@@ -54,7 +54,7 @@ class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
                 wind_speed=wind_speed
             )
 
-            print("[DEBUG] Weather data saved in MongoDB.")
+            print("Weather data saved in MongoDB.")
 
             return weather_pb2.WeatherResponse(
                 city=city,
@@ -65,13 +65,13 @@ class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
             )
 
         except requests.exceptions.HTTPError as http_err:
-            print(f"[ERROR] HTTP error occurred: {http_err}")
+            print(f"HTTP error occurred: {http_err}")
             context.abort(grpc.StatusCode.NOT_FOUND, f"City '{city}' not found or invalid response.")
 
         except requests.exceptions.RequestException as req_err:
-            print(f"[ERROR] Network-related error: {req_err}")
+            print(f"Network-related error: {req_err}")
             context.abort(grpc.StatusCode.UNAVAILABLE, "Weather service is currently unreachable.")
 
         except Exception as e:
-            print(f"[ERROR] Unexpected error: {e}")
+            print(f"Unexpected error: {e}")
             context.abort(grpc.StatusCode.INTERNAL, "Internal server error while fetching weather data.")

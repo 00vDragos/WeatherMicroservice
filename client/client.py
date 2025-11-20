@@ -31,7 +31,7 @@ def main():
             print(f"Wind Speed: {response.wind_speed} m/s")
 
         except grpc.RpcError as e:
-            print(f"\n❌ Error: {e.code().name} - {e.details()}")
+            print(f"\n Error: {e.code().name} - {e.details()}")
 
 
 if __name__ == "__main__":

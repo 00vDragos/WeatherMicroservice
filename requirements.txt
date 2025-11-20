@@ -4,3 +4,7 @@ requests~=2.32.5
 pymongo
 python-dotenv~=1.2.1
 protobuf~=6.33.1
+
+fastapi
+uvicorn
+pymongo
