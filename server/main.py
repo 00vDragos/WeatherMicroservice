@@ -6,20 +6,20 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import logging
 
-from api import weather_pb2, weather_pb2_grpc
-from services.weather_service import WeatherService
-from api.rest_api import router as rest_router
+from server.api import weather_pb2, weather_pb2_grpc
+from server.services.weather_service import WeatherService
+from server.api.rest_api import router as rest_router
 
-# Incarcare variabile .env
+#Incarcare variabile .env
 load_dotenv()
 GRPC_API_KEY = os.getenv("GRPC_API_KEY")
 PORT = 50051
 
-# Configurare logging
+#Configurare logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("weather_app")
 
-# Interceptor pentru x-api-key
+#Interceptor pentru x-api-key
 class AuthInterceptor(grpc.ServerInterceptor):
     def intercept_service(self, continuation, handler_call_details):
         metadata = dict(handler_call_details.invocation_metadata)
@@ -40,7 +40,7 @@ def serve():
     server.start()
     server.wait_for_termination()
 
-# FastAPI app
+#FastAPI app
 app = FastAPI()
 app.include_router(rest_router)
 

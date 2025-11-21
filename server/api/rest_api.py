@@ -7,9 +7,9 @@ service = WeatherService(api_key=os.getenv("OPENWEATHER_API_KEY"))
 
 @router.get("/api/weather")
 async def get_weather_data(city: str):
-    """
-    Endpoint async care interogheaza datele meteo pentru orasul cerut.
-    """
+
+   #Endpoint async care interogheaza datele meteo pentru orasul cerut.
+
     try:
         return await service.get_weather_data(city)
     except ValueError as e:

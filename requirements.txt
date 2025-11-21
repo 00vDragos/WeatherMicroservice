@@ -1,17 +1,22 @@
-# --- gRPC ---
+#gRPC
 grpcio~=1.76.0
 grpcio-tools
 protobuf~=6.33.1
 
-# --- HTTP & Utils ---
+#HTTP&Utils
 requests~=2.32.3
 httpx==0.27.2
 python-dotenv~=1.2.1
 
-# --- FastAPI (REST API) ---
+#FastAPI(REST API)
 fastapi
 uvicorn
 
-# --- MongoDB (async + sync compat) ---
+#MongoDB (async + sync compat)
 pymongo==4.5.0
 motor==3.3.2
+
+
+#TESTS
+pytest
+pytest-asyncio

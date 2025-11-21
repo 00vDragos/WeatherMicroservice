@@ -9,10 +9,10 @@ class WeatherService:
         self.repo = WeatherRepository()
 
     async def get_weather_data(self, city: str):
-        """
-        Cauta in baza de date datele meteo pentru orasul cerut.
-        Daca nu exista, apeleaza OpenWeatherMap si salveaza rezultatul.
-        """
+
+       #Cauta in baza de date datele orasului cerut, daca nu exista apeleaza OpenWeatherMap
+
+
         data = await self.repo.get_latest_for_city(city)
 
         if data:
@@ -28,7 +28,7 @@ class WeatherService:
                 for entry in reversed(data)
             ]
 
-        # Daca nu exista in DB -> apelam OpenWeatherMap
+        #Daca nu exista in DB -> apelam OpenWeatherMap
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={self.api_key}&units=metric"
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
