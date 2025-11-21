@@ -1,32 +1,27 @@
+from motor.motor_asyncio import AsyncIOMotorClient
 import os
-from datetime import datetime, UTC
-from pymongo import MongoClient
-from dotenv import load_dotenv
-
-
-
-load_dotenv()
-
-MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = "weatherdb"
-COLLECTION_NAME = "weather_data"
 
 
 class WeatherRepository:
     def __init__(self):
-        self.client = MongoClient(MONGO_URI)
-        self.db = self.client[DB_NAME]
-        self.collection = self.db[COLLECTION_NAME]
+        mongo_uri = os.getenv("MONGO_URI", "mongodb://mongo:27017")
+        client = AsyncIOMotorClient(mongo_uri)
+        self.db = client["weatherdb"]
+        self.collection = self.db["weather_data"]
 
-    def save_weather_data(self, city: str, temperature: float, humidity: int, description: str, wind_speed: float):
-        document = {
-            "city": city,
-            "temperature": temperature,
-            "humidity": humidity,
-            "description": description,
-            "wind_speed": wind_speed,
-            "timestamp": datetime.now(UTC)
-        }
+    async def get_latest_for_city(self, city: str, limit: int = 10):
 
-        result = self.collection.insert_one(document)
-        return str(result.inserted_id)
+    #Returneaza ultimele 10 inregistrari pentru un oras.
+
+        cursor = (
+            self.collection.find({"city": {"$regex": f"^{city}$", "$options": "i"}})
+            .sort("timestamp", -1)
+            .limit(limit)
+        )
+        return [doc async for doc in cursor]
+
+    async def insert_entry(self, entry: dict):
+
+    #Insereaza o inregistrare noua in baza de date.
+
+        await self.collection.insert_one(entry)

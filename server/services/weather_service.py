@@ -1,77 +1,50 @@
-import os
-import requests
-import grpc
-from dotenv import load_dotenv
-
-from server.api import weather_pb2, weather_pb2_grpc
+from datetime import datetime, timezone
+import httpx
 from server.repositories.weather_repository import WeatherRepository
 
-load_dotenv()
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
-
-class WeatherService(weather_pb2_grpc.WeatherServiceServicer):
-    def __init__(self):
+class WeatherService:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
         self.repo = WeatherRepository()
 
-    def GetWeather(self, request, context):
-        city = request.city
+    async def get_weather_data(self, city: str):
 
-        url = (
-            f"http://api.openweathermap.org/data/2.5/weather"
-            f"?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
-        )
+       #Cauta in baza de date datele orasului cerut, daca nu exista apeleaza OpenWeatherMap
 
-        print(f" Fetching weather for city: {city}")
-        print(f" API key: {OPENWEATHER_API_KEY}")
-        print(f"URL: {url}")
 
-        try:
-            response = requests.get(url)
-            print(f" Raw response object: {response}")
-            print(f" Status code: {response.status_code}")
+        data = await self.repo.get_latest_for_city(city)
 
-            response.raise_for_status()  # va genera HTTPError pentru coduri 4xx/5xx
+        if data:
+            return [
+                {
+                    "timestamp": entry.get("timestamp").isoformat() if entry.get("timestamp") else None,
+                    "city": entry.get("city"),
+                    "temperature": entry.get("temperature"),
+                    "humidity": entry.get("humidity"),
+                    "description": entry.get("description"),
+                    "wind_speed": entry.get("wind_speed"),
+                }
+                for entry in reversed(data)
+            ]
 
-            print(" Status OK. Parsing JSON...")
-            data = response.json()
-            print(f"OpenWeatherMap raw response: {data}")
+        #Daca nu exista in DB -> apelam OpenWeatherMap
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={self.api_key}&units=metric"
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
 
-            # Extragem datele
-            temperature = data["main"]["temp"]
-            humidity = data["main"]["humidity"]
-            description = data["weather"][0]["description"]
-            wind_speed = data["wind"]["speed"]
+        if response.status_code != 200:
+            raise ValueError(f"City not found or API error: {response.status_code}")
 
-            print(f"Extracted data-> temp: {temperature}, humidity: {humidity}, desc: {description}, wind: {wind_speed}")
+        weather_data = response.json()
+        entry = {
+            "timestamp": datetime.now(timezone.utc),
+            "city": weather_data.get("name", city),
+            "temperature": weather_data["main"]["temp"],
+            "humidity": weather_data["main"]["humidity"],
+            "description": weather_data["weather"][0]["description"],
+            "wind_speed": weather_data["wind"]["speed"],
+        }
 
-            # Salvăm în MongoDB
-            self.repo.save_weather_data(
-                city=city,
-                temperature=temperature,
-                humidity=humidity,
-                description=description,
-                wind_speed=wind_speed
-            )
-
-            print("Weather data saved in MongoDB.")
-
-            return weather_pb2.WeatherResponse(
-                city=city,
-                temperature=temperature,
-                description=description,
-                humidity=humidity,
-                wind_speed=wind_speed
-            )
-
-        except requests.exceptions.HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")
-            context.abort(grpc.StatusCode.NOT_FOUND, f"City '{city}' not found or invalid response.")
-
-        except requests.exceptions.RequestException as req_err:
-            print(f"Network-related error: {req_err}")
-            context.abort(grpc.StatusCode.UNAVAILABLE, "Weather service is currently unreachable.")
-
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-            context.abort(grpc.StatusCode.INTERNAL, "Internal server error while fetching weather data.")
+        await self.repo.insert_entry(entry)
+        return [entry]
